@@ -1,10 +1,10 @@
-# elm-pages-starter
+# Renters Union Nashvile
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/dillonkearns/elm-pages-starter)
+Welcome to the code for https://runashville.org!
 
 ## Setup Instructions
 
-You can clone this repo with `git clone https://github.com/dillonkearns/elm-pages-starter.git`.
+You can clone this repo with `git clone https://github.com/renters-union-nashville/website.git`.
 
 `npm install` from the cloned repo. Before running the dev server or build, make sure to install Lamdera (see below).
 
