@@ -1,15 +1,18 @@
 module Route.Index exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
+import BackendTask.Custom
 import FatalError exposing (FatalError)
 import Head
 import Head.Seo as Seo
 import Html
+import Json.Decode as Decode
+import Json.Encode as Encode
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
-import UrlPath
+import Post exposing (Post)
 import Route
-import RouteBuilder exposing (App, StatelessRoute)
+import RouteBuilder exposing (App, StatefulRoute, StatelessRoute)
 import Shared
 import View exposing (View)
 
@@ -26,11 +29,6 @@ type alias RouteParams =
     {}
 
 
-type alias Data =
-    { message : String
-    }
-
-
 type alias ActionData =
     {}
 
@@ -44,11 +42,20 @@ route =
         |> RouteBuilder.buildNoState { view = view }
 
 
+type alias Data =
+    { posts : List Post
+    }
+
+
 data : BackendTask FatalError Data
 data =
     BackendTask.succeed Data
         |> BackendTask.andMap
-            (BackendTask.succeed "Hello!")
+            (BackendTask.Custom.run "posts"
+                Encode.null
+                (Decode.list Post.decoder)
+                |> BackendTask.allowFatal
+            )
 
 
 head :
@@ -57,16 +64,16 @@ head :
 head app =
     Seo.summary
         { canonicalUrlOverride = Nothing
-        , siteName = "elm-pages"
+        , siteName = "Renters Union Nashville"
         , image =
-            { url = [ "images", "icon-png.png" ] |> UrlPath.join |> Pages.Url.fromPath
-            , alt = "elm-pages logo"
+            { url = Pages.Url.external "TODO"
+            , alt = "Renters Union Nashville Logo"
             , dimensions = Nothing
             , mimeType = Nothing
             }
-        , description = "Welcome to elm-pages!"
+        , description = "A free website that keeps the people informed about housing and evictions."
         , locale = Nothing
-        , title = "elm-pages is running"
+        , title = "Renters Union Nashville - RUN"
         }
         |> Seo.website
 
@@ -76,13 +83,21 @@ view :
     -> Shared.Model
     -> View (PagesMsg Msg)
 view app shared =
-    { title = "elm-pages is running"
+    { title = "Renters Union Nashville"
     , body =
-        [ Html.h1 [] [ Html.text "elm-pages is up and running!" ]
-        , Html.p []
-            [ Html.text <| "The message is: " ++ app.data.message
-            ]
-        , Route.Blog__Slug_ { slug = "hello" }
-            |> Route.link [] [ Html.text "My blog post" ]
+        [ Html.h1 [] [ Html.text "Posts" ]
+        , app.data.posts
+            |> List.map postView
+            |> Html.ul []
         ]
     }
+
+
+postView : Post -> Html.Html msg
+postView post =
+    Html.li []
+        [ Route.Admin__Slug_ { slug = post.slug }
+            |> Route.link []
+                [ Html.text post.title
+                ]
+        ]

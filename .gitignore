@@ -10,3 +10,5 @@ functions/render
 
 # Local Netlify folder
 .netlify
+
+.env
